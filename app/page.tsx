@@ -5,10 +5,21 @@ import { AuthHeader } from './components/Auth/AuthHeader';
 import { QuickFilters } from './components/Filter/QuickFilters';
 import { ReportButton } from './components/Report/ReportButton';
 import { ReportForm } from './components/Report/ReportForm';
+import { CCTVModal } from './components/CCTV/CCTVModal';
 import { useReports } from './hooks/useReports';
+import { useCCTV } from './hooks/useCCTV';
 import { FilterType, ReportType, FloodReport } from './lib/types';
+import { CCTVCamera } from './lib/cctv-types';
 
-function LazyMap({ reports, filter }: { reports: FloodReport[]; filter: FilterType }) {
+interface LazyMapProps {
+  reports: FloodReport[];
+  filter: FilterType;
+  cameras: CCTVCamera[];
+  showCCTV: boolean;
+  onCameraClick: (camera: CCTVCamera) => void;
+}
+
+function LazyMap({ reports, filter, cameras, showCCTV, onCameraClick }: LazyMapProps) {
   const [MapComponent, setMapComponent] = useState<React.ComponentType<any> | null>(null);
 
   useEffect(() => {
@@ -25,15 +36,18 @@ function LazyMap({ reports, filter }: { reports: FloodReport[]; filter: FilterTy
     );
   }
 
-  return <MapComponent reports={reports} filter={filter} />;
+  return <MapComponent reports={reports} filter={filter} cameras={cameras} showCCTV={showCCTV} onCameraClick={onCameraClick} />;
 }
 
 export default function Home() {
   const { reports, loading, error } = useReports();
+  const { cameras, loading: cctvLoading } = useCCTV();
   const [filter, setFilter] = useState<FilterType>('all');
   const [showForm, setShowForm] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('flood');
   const [mounted, setMounted] = useState(false);
+  const [showCCTV, setShowCCTV] = useState(true);
+  const [selectedCamera, setSelectedCamera] = useState<CCTVCamera | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -44,8 +58,8 @@ export default function Home() {
     setShowForm(true);
   };
 
-  const handleSuccess = () => {
-    // Report submitted successfully
+  const handleCameraClick = (camera: CCTVCamera) => {
+    setSelectedCamera(camera);
   };
 
   return (
@@ -70,12 +84,29 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <LazyMap reports={reports} filter={filter} />
+          <LazyMap 
+            reports={reports} 
+            filter={filter} 
+            cameras={cameras}
+            showCCTV={showCCTV}
+            onCameraClick={handleCameraClick}
+          />
         )}
       </div>
 
       {/* Quick Filters */}
       <QuickFilters activeFilter={filter} onFilterChange={setFilter} />
+
+      {/* CCTV Toggle */}
+      <button
+        onClick={() => setShowCCTV(!showCCTV)}
+        className={`fixed top-20 right-4 z-[1000] px-4 py-2 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all ${
+          showCCTV ? 'bg-cyan-400 text-black' : 'bg-zinc-700 text-white'
+        }`}
+      >
+        📹 CCTV {showCCTV ? 'ON' : 'OFF'}
+        {!cctvLoading && <span className="ml-1 text-xs">({cameras.length})</span>}
+      </button>
 
       {/* Report Button */}
       <ReportButton onReport={handleReport} />
@@ -85,14 +116,25 @@ export default function Home() {
         <ReportForm
           type={reportType}
           onClose={() => setShowForm(false)}
-          onSuccess={handleSuccess}
+          onSuccess={() => {}}
+        />
+      )}
+
+      {/* CCTV Modal */}
+      {selectedCamera && (
+        <CCTVModal
+          camera={selectedCamera}
+          onClose={() => setSelectedCamera(null)}
         />
       )}
 
       {/* Stats Overlay */}
       <div className="fixed bottom-4 left-4 z-[999] bg-zinc-900/90 border-2 border-zinc-700 px-3 py-2 text-sm">
-        <span className="text-zinc-400">Laporan aktif: </span>
+        <span className="text-zinc-400">Laporan: </span>
         <span className="text-yellow-400 font-bold">{reports.length}</span>
+        <span className="text-zinc-600 mx-2">|</span>
+        <span className="text-zinc-400">CCTV: </span>
+        <span className="text-cyan-400 font-bold">{cameras.length}</span>
       </div>
     </main>
   );
