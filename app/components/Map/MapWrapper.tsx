@@ -168,19 +168,18 @@ export function MapWrapper({ reports, filter, cameras, showCCTV, showLines, onCa
 
   return (
     <div className="relative h-full w-full">
-      {/* District Legend */}
+      {/* District Legend - Bottom left on desktop, collapsible on mobile */}
       {showCCTV && (
-        <div className="absolute top-2 left-2 z-[1000]">
+        <div className="absolute bottom-24 sm:bottom-4 left-2 sm:left-auto sm:right-4 z-[1000]">
           <button 
             onClick={() => setShowLegend(!showLegend)}
-            className="sm:hidden mb-1 px-2 py-1.5 bg-zinc-900/95 border-2 border-zinc-700 text-white text-xs font-bold flex items-center gap-1"
+            className="mb-1 px-2 py-1.5 bg-zinc-900/95 border-2 border-zinc-700 text-white text-xs font-bold flex items-center gap-1 w-full sm:w-auto"
           >
             🗺️ Kecamatan {showLegend ? '▲' : '▼'}
           </button>
           
-          <div className={`bg-zinc-900/95 border-2 border-zinc-700 backdrop-blur-sm transition-all ${showLegend ? 'block' : 'hidden sm:block'}`}>
-            <div className="p-2 max-h-[200px] sm:max-h-[280px] overflow-y-auto">
-              <p className="text-zinc-400 text-[10px] font-bold mb-1.5 uppercase hidden sm:block">Kecamatan</p>
+          <div className={`bg-zinc-900/95 border-2 border-zinc-700 backdrop-blur-sm transition-all ${showLegend ? 'block' : 'hidden'}`}>
+            <div className="p-2 max-h-[180px] sm:max-h-[240px] overflow-y-auto">
               <button 
                 onClick={() => setSelectedDistrict(null)} 
                 className={`w-full text-left px-2 py-1 text-[11px] sm:text-xs font-bold mb-0.5 transition-all rounded ${!selectedDistrict ? 'bg-white text-black' : 'text-zinc-400 hover:bg-zinc-800'}`}

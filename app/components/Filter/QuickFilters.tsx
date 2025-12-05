@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { FilterType } from '../../lib/types';
 
 interface QuickFiltersProps {
@@ -8,17 +7,14 @@ interface QuickFiltersProps {
   onFilterChange: (filter: FilterType) => void;
 }
 
-const filters: { type: FilterType; label: string; shortLabel: string; emoji: string }[] = [
-  { type: 'all', label: 'Semua', shortLabel: 'All', emoji: '📍' },
-  { type: 'passable', label: 'Bisa Lewat', shortLabel: 'Lewat', emoji: '🚗' },
-  { type: 'blocked', label: 'Lumpuh Total', shortLabel: 'Block', emoji: '🚫' },
-  { type: 'dry', label: 'Jalan Kering', shortLabel: 'Kering', emoji: '✅' },
+const filters: { type: FilterType; label: string; shortLabel: string; emoji: string; color: string }[] = [
+  { type: 'all', label: 'Semua', shortLabel: 'All', emoji: '📍', color: 'bg-zinc-600' },
+  { type: 'passable', label: 'Bisa Lewat', shortLabel: 'Lewat', emoji: '🟡', color: 'bg-yellow-500' },
+  { type: 'blocked', label: 'Lumpuh Total', shortLabel: 'Block', emoji: '🔴', color: 'bg-red-500' },
+  { type: 'dry', label: 'Jalan Kering', shortLabel: 'Kering', emoji: '🟢', color: 'bg-green-500' },
 ];
 
 export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const activeFilterData = filters.find(f => f.type === activeFilter);
-
   return (
     <>
       {/* Mobile: Horizontal compact bar at bottom */}
@@ -41,25 +37,26 @@ export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps
         </div>
       </div>
 
-      {/* Desktop: Vertical buttons on left */}
-      <div className="hidden sm:flex fixed top-[72px] left-4 z-[1000] flex-col gap-1.5">
+      {/* Desktop: Horizontal bar below header */}
+      <div className="hidden sm:flex fixed top-[64px] left-1/2 -translate-x-1/2 z-[1001] gap-1">
         {filters.map((filter) => (
           <button
             key={filter.type}
             onClick={() => onFilterChange(filter.type)}
             className={`
-              px-3 py-2 font-bold text-xs border-2 border-black
-              shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
+              px-3 py-1.5 font-bold text-xs border-2 border-black
+              shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
               hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]
-              hover:translate-x-[2px] hover:translate-y-[2px]
-              transition-all whitespace-nowrap
+              hover:translate-x-[1px] hover:translate-y-[1px]
+              transition-all whitespace-nowrap flex items-center gap-1.5
               ${activeFilter === filter.type
                 ? 'bg-yellow-400 text-black'
                 : 'bg-zinc-800 text-white hover:bg-zinc-700'
               }
             `}
           >
-            {filter.emoji} {filter.label}
+            <span className={`w-2.5 h-2.5 rounded-full ${filter.color}`}></span>
+            {filter.label}
           </button>
         ))}
       </div>

@@ -208,9 +208,10 @@ export default function Home() {
       />
 
       {/* Stats Overlay */}
-      <div className="fixed bottom-20 sm:bottom-4 left-2 sm:left-4 z-[999] bg-zinc-900/95 border-2 border-zinc-700 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm backdrop-blur-sm">
+      <div className="fixed bottom-20 sm:bottom-4 left-2 z-[999] bg-zinc-900/95 border-2 border-zinc-700 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm backdrop-blur-sm">
         <span className="text-zinc-400">📊 </span>
         <span className="text-yellow-400 font-bold">{reports.length}</span>
+        <span className="text-zinc-500 text-[10px] sm:text-xs ml-1">Laporan</span>
         <span className="text-zinc-600 mx-1 sm:mx-2">|</span>
         <span className="text-cyan-400 font-bold">{cameras.length}</span>
         <span className="text-zinc-500 text-[10px] sm:text-xs ml-1">CCTV</span>
