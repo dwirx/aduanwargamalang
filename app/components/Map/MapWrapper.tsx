@@ -60,17 +60,18 @@ export function MapWrapper({ reports, filter, cameras, showCCTV, onCameraClick }
     return new L.Icon({ iconUrl: 'data:image/svg+xml;base64,' + btoa(svg), iconSize: [32, 32], iconAnchor: [16, 16] });
   };
 
-  // Create CCTV marker icon
-  const createCCTVIcon = () => {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
-      <rect x="2" y="6" width="16" height="12" rx="2" fill="#06B6D4" stroke="#000" stroke-width="1.5"/>
-      <polygon points="18,9 22,7 22,17 18,15" fill="#06B6D4" stroke="#000" stroke-width="1.5"/>
-      <circle cx="8" cy="12" r="3" fill="#000"/>
+  // Create CCTV marker icon with better design
+  const createCCTVIcon = (isIntersection: boolean = false) => {
+    const color = isIntersection ? '#FBBF24' : '#06B6D4';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+      <circle cx="16" cy="16" r="14" fill="${color}" stroke="#000" stroke-width="2"/>
+      <rect x="8" y="11" width="12" height="8" rx="1" fill="#000"/>
+      <polygon points="20,13 24,11 24,21 20,19" fill="#000"/>
+      <circle cx="12" cy="15" r="2" fill="${color}"/>
+      <circle cx="16" cy="28" r="3" fill="${color}" stroke="#000" stroke-width="1.5" opacity="0.5"/>
     </svg>`;
-    return new L.Icon({ iconUrl: 'data:image/svg+xml;base64,' + btoa(svg), iconSize: [28, 28], iconAnchor: [14, 14] });
+    return new L.Icon({ iconUrl: 'data:image/svg+xml;base64,' + btoa(svg), iconSize: [32, 32], iconAnchor: [16, 28], popupAnchor: [0, -28] });
   };
-
-  const cctvIcon = createCCTVIcon();
 
   return (
     <MapContainer center={MALANG_CENTER} zoom={DEFAULT_ZOOM} className="h-full w-full" style={{ background: '#1a1a1a' }}>
@@ -85,10 +86,10 @@ export function MapWrapper({ reports, filter, cameras, showCCTV, onCameraClick }
         return (
           <Marker key={report.id} position={[report.latitude, report.longitude]} icon={icon}>
             <Popup>
-              <div className="p-2">
-                <p className="font-bold">{label}</p>
-                <p className="text-sm">{new Date(report.created_at).toLocaleString('id-ID')}</p>
-                <p className="text-sm">✅ {report.confirmation_count} konfirmasi</p>
+              <div className="p-3">
+                <p className="font-bold text-lg">{label}</p>
+                <p className="text-sm text-zinc-400 mt-1">{new Date(report.created_at).toLocaleString('id-ID')}</p>
+                <p className="text-sm text-green-400 mt-1">✅ {report.confirmation_count} konfirmasi</p>
               </div>
             </Popup>
           </Marker>
@@ -96,30 +97,43 @@ export function MapWrapper({ reports, filter, cameras, showCCTV, onCameraClick }
       })}
 
       {/* CCTV Cameras */}
-      {showCCTV && cameras.map((camera) => (
-        <Marker 
-          key={camera.id} 
-          position={[parseFloat(camera.latitude), parseFloat(camera.longitude)]} 
-          icon={cctvIcon}
-          eventHandlers={{
-            click: () => onCameraClick(camera)
-          }}
-        >
-          <Popup>
-            <div className="p-2 min-w-[200px]">
-              <p className="font-bold text-cyan-600">📹 {camera.name}</p>
-              <p className="text-xs text-gray-500">{camera.district}</p>
-              <p className="text-xs mt-1">{camera.street}</p>
-              <button 
-                onClick={() => onCameraClick(camera)}
-                className="mt-2 w-full py-1 bg-cyan-500 text-white text-sm font-bold rounded"
-              >
-                Lihat Stream
-              </button>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {showCCTV && cameras.map((camera) => {
+        const cctvIcon = createCCTVIcon(camera.isIntersection === 1);
+        return (
+          <Marker 
+            key={camera.id} 
+            position={[parseFloat(camera.latitude), parseFloat(camera.longitude)]} 
+            icon={cctvIcon}
+            eventHandlers={{
+              click: () => onCameraClick(camera)
+            }}
+          >
+            <Popup>
+              <div className="p-3 min-w-[250px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span className="text-xs text-green-400 font-bold">LIVE</span>
+                </div>
+                <p className="font-bold text-cyan-400 text-lg">📹 {camera.name}</p>
+                <p className="text-xs text-zinc-500 mt-1">{camera.formatted_address}</p>
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  <span className="px-2 py-0.5 bg-cyan-900 text-cyan-300 text-xs font-bold rounded">{camera.district}</span>
+                  <span className="px-2 py-0.5 bg-zinc-700 text-zinc-300 text-xs rounded">{camera.camera_type}</span>
+                  {camera.isIntersection === 1 && (
+                    <span className="px-2 py-0.5 bg-yellow-900 text-yellow-300 text-xs font-bold rounded">⚠️ Simpang</span>
+                  )}
+                </div>
+                <button 
+                  onClick={() => onCameraClick(camera)}
+                  className="mt-3 w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                >
+                  🎥 Lihat Stream
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
     </MapContainer>
   );
 }

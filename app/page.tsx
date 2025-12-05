@@ -6,6 +6,7 @@ import { QuickFilters } from './components/Filter/QuickFilters';
 import { ReportButton } from './components/Report/ReportButton';
 import { ReportForm } from './components/Report/ReportForm';
 import { CCTVModal } from './components/CCTV/CCTVModal';
+import { CCTVPanel } from './components/CCTV/CCTVPanel';
 import { useReports } from './hooks/useReports';
 import { useCCTV } from './hooks/useCCTV';
 import { FilterType, ReportType, FloodReport } from './lib/types';
@@ -48,6 +49,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [showCCTV, setShowCCTV] = useState(true);
   const [selectedCamera, setSelectedCamera] = useState<CCTVCamera | null>(null);
+  const [showCCTVPanel, setShowCCTVPanel] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -97,16 +99,26 @@ export default function Home() {
       {/* Quick Filters */}
       <QuickFilters activeFilter={filter} onFilterChange={setFilter} />
 
-      {/* CCTV Toggle */}
-      <button
-        onClick={() => setShowCCTV(!showCCTV)}
-        className={`fixed top-20 right-4 z-[1000] px-4 py-2 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all ${
-          showCCTV ? 'bg-cyan-400 text-black' : 'bg-zinc-700 text-white'
-        }`}
-      >
-        📹 CCTV {showCCTV ? 'ON' : 'OFF'}
-        {!cctvLoading && <span className="ml-1 text-xs">({cameras.length})</span>}
-      </button>
+      {/* CCTV Controls */}
+      <div className="fixed top-20 right-4 z-[1000] flex flex-col gap-2">
+        <button
+          onClick={() => setShowCCTV(!showCCTV)}
+          className={`px-4 py-2 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all ${
+            showCCTV ? 'bg-cyan-400 text-black' : 'bg-zinc-700 text-white'
+          }`}
+        >
+          📹 {showCCTV ? 'ON' : 'OFF'}
+          {!cctvLoading && <span className="ml-1 text-xs">({cameras.length})</span>}
+        </button>
+        <button
+          onClick={() => setShowCCTVPanel(!showCCTVPanel)}
+          className={`px-4 py-2 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all ${
+            showCCTVPanel ? 'bg-cyan-600 text-white' : 'bg-zinc-800 text-cyan-400'
+          }`}
+        >
+          📋 List
+        </button>
+      </div>
 
       {/* Report Button */}
       <ReportButton onReport={handleReport} />
@@ -117,6 +129,8 @@ export default function Home() {
           type={reportType}
           onClose={() => setShowForm(false)}
           onSuccess={() => {}}
+          cameras={cameras}
+          onCameraSelect={handleCameraClick}
         />
       )}
 
@@ -128,8 +142,16 @@ export default function Home() {
         />
       )}
 
+      {/* CCTV Panel */}
+      <CCTVPanel
+        cameras={cameras}
+        isOpen={showCCTVPanel}
+        onClose={() => setShowCCTVPanel(false)}
+        onCameraSelect={handleCameraClick}
+      />
+
       {/* Stats Overlay */}
-      <div className="fixed bottom-4 left-4 z-[999] bg-zinc-900/90 border-2 border-zinc-700 px-3 py-2 text-sm">
+      <div className="fixed bottom-4 left-4 z-[999] bg-zinc-900/90 border-2 border-zinc-700 px-3 py-2 text-sm backdrop-blur-sm">
         <span className="text-zinc-400">Laporan: </span>
         <span className="text-yellow-400 font-bold">{reports.length}</span>
         <span className="text-zinc-600 mx-2">|</span>

@@ -49,7 +49,7 @@ body {
 /* Popup Styling */
 .leaflet-popup-content-wrapper {
   background: #18181b !important;
-  border: 2px solid #facc15 !important;
+  border: 2px solid #06b6d4 !important;
   border-radius: 0 !important;
   padding: 0 !important;
   box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1) !important;
@@ -57,23 +57,36 @@ body {
 
 .leaflet-popup-content {
   margin: 0 !important;
-  min-width: 280px !important;
+  min-width: 250px !important;
+  color: #fafafa !important;
 }
 
 .leaflet-popup-tip {
-  background: #facc15 !important;
+  background: #06b6d4 !important;
 }
 
 .leaflet-popup-close-button {
-  color: #facc15 !important;
+  color: #06b6d4 !important;
   font-size: 20px !important;
   font-weight: bold !important;
   top: 8px !important;
   right: 8px !important;
+  width: 24px !important;
+  height: 24px !important;
 }
 
 .leaflet-popup-close-button:hover {
-  color: #fef08a !important;
+  color: #22d3ee !important;
+  background: rgba(6, 182, 212, 0.2) !important;
+}
+
+/* Flood report popup - yellow border */
+.flood-popup .leaflet-popup-content-wrapper {
+  border-color: #facc15 !important;
+}
+
+.flood-popup .leaflet-popup-tip {
+  background: #facc15 !important;
 }
 
 /* Neobrutalist Button Animation */
@@ -112,4 +125,93 @@ body {
 ::selection {
   background: #facc15;
   color: #000;
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-slideLeft {
+  animation: slideLeft 0.3s ease-out forwards;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+/* CCTV Marker Animation */
+@keyframes cctvPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.cctv-marker {
+  animation: cctvPulse 2s ease-in-out infinite;
+}
+
+/* Live indicator */
+@keyframes liveBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.animate-live {
+  animation: liveBlink 1s ease-in-out infinite;
 }
